@@ -11,13 +11,14 @@ defmodule RevisionairEcto do
     repo = extract_repo(options)
     item_type = to_string item_type
 
-    repo.insert_all("revisions", [%{
+    {1, _} = repo.insert_all("revisions", [%{
                                    item_type: item_type,
                                    item_id: item_id,
-                                   item_map: item,
+                                   item_map: encode_struct(item),
                                    metadata: metadata,
                                    revision: next_revision(item_type, item_id, repo)
                                  }])
+    :ok
   end
 
   def list_revisions(item_type, item_id, options) do
@@ -25,7 +26,7 @@ defmodule RevisionairEcto do
     item_type = to_string item_type
 
     repo.all(from r in "revisions", where: r.item_type == ^item_type and r.item_id == ^item_id, select: {r.revision, {r.item_map, r.metadata}}, order_by: [desc: :revision])
-    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({item, metadata}, revision) end)
+    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_struct(item), metadata}, revision) end)
   end
 
   def newest_revision(item_type, item_id, options) do
@@ -34,7 +35,7 @@ defmodule RevisionairEcto do
 
     case repo.all(from r in "revisions", where: r.item_type == ^item_type and r.item_id == ^item_id, limit: 1, order_by: [desc: :revision], select: {r.revision, {r.item_map, r.metadata}}) do
       [] -> :error
-      [{revision, {data, metadata}}] -> {:ok, put_revision_in_metadata({data, metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_struct(item), metadata}, revision)}
     end
   end
 
@@ -44,7 +45,7 @@ defmodule RevisionairEcto do
 
     case repo.all(from r in "revisions", where: r.item_type == ^item_type and r.item_id == ^item_id and r.revision == ^revision, limit: 1, select: {r.revision, {r.item_map, r.metadata}}) do
       [] -> :error
-      [{revision, {data, metadata}}] -> {:ok, put_revision_in_metadata({data, metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_struct(item), metadata}, revision)}
     end
   end
 
@@ -70,5 +71,23 @@ defmodule RevisionairEcto do
       [] -> 0
       [num] -> num + 1
     end
+  end
+
+  def decode_struct(encoded_struct_string_keys = %{"___struct___" => struct_module_string}) do
+    struct_module = String.to_existing_atom(struct_module_string)
+
+    encoded_struct = for {key, val} <- encoded_struct_string_keys, key != "___struct___", into: %{} do
+      {String.to_existing_atom(key), val}
+    end
+
+    struct(struct_module, encoded_struct)
+  end
+
+  def encode_struct(struct) do
+    struct
+    |> Map.from_struct
+    |> Map.put(:___struct___, struct.__struct__ |> to_string)
+    |> Enum.map(fn {k, v} -> {k |> to_string, v} end)
+    |> Enum.into(%{})
   end
 end

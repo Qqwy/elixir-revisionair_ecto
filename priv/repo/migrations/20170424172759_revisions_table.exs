@@ -10,6 +10,7 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsTable do
       add :item_map, :map, null: false
       add :metadata, :map, null: false
       add :revision, :integer, null: false
+      add :struct_name, :string
     end
 
     create index(:revisions, [:item_type, :item_id])

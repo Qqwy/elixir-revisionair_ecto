@@ -24,6 +24,8 @@ defmodule RevisionairEctoTest do
     assert Revisionair.delete_all_revisions_of(f1b, [storage: RevisionairEcto]) == :ok
     assert Revisionair.list_revisions(f1b, [storage: RevisionairEcto]) == []
     assert Revisionair.list_revisions(f1, [storage: RevisionairEcto]) == []
+
+    Repo.delete_all("revisions")
   end
 
   test "explicit structure_type and unique_identifier with Revision.Storage.Agent" do
@@ -34,6 +36,7 @@ defmodule RevisionairEctoTest do
     assert Revisionair.store_revision(f1b, [storage: RevisionairEcto]) == :ok
     assert Revisionair.list_revisions(TestStruct, 1, [storage: RevisionairEcto]) == [{f1b, %{revision: 1}},
                                                                                                    {f1, %{revision: 0}}]
+    Repo.delete_all("revisions")
   end
 
   test "get_revision" do
@@ -48,5 +51,6 @@ defmodule RevisionairEctoTest do
     assert Revisionair.get_revision(f1b, 0, [storage: RevisionairEcto]) == \
     {:ok, {%TestStruct{bar: 2, foo: 0, id: 1}, %{revision: 0}}}
 
+    Repo.delete_all("revisions")
   end
 end

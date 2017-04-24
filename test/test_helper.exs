@@ -11,6 +11,7 @@ defmodule Post do
   end
 end
 
+Mix.Task.run "ecto.drop", ~w(-r RevisionairEcto.Repo)
 Mix.Task.run "ecto.create", ~w(-r RevisionairEcto.Repo)
 Mix.Task.run "ecto.migrate", ~w(-r RevisionairEcto.Repo)
 
