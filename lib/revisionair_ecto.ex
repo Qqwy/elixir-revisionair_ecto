@@ -5,22 +5,57 @@ defmodule RevisionairEcto do
   TODO How to get Repo?
   """
 
-  def store_revision(structure_type, unique_identifier) do
+  def store_revision(item, item_type, item_id, metadata, options) do
+    repo = extract_repo(options)
+
+    repo.insert_all("revisions", [[
+                                   item_type: item_type,
+                                   item_id: item_id,
+                                   item_map: item,
+                                   metadata: metadata,
+                                   revision: next_revision(item_type, item_id)
+                                 ]])
   end
 
-  def list_revisions(structure_type, unique_identifier) do
+  def list_revisions(item_type, item_id, options) do
+    repo = extract_repo(options)
+
+    repo.all(from r in "revisions", select: {r.revision, {r.item_map, r.metadata}}, order_by: [desc: :revision])
+    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({item, metadata}, revision) end)
   end
 
-  def newest_revision(structure_type, unique_identifier) do
+  def newest_revision(item_type, item_id, options) do
+    repo = extract_repo(options)
   end
 
-  def get_revision(structure_type, unique_identifier, revision) do
+  def get_revision(item_type, item_id, revision, options) do
+    repo = extract_repo(options)
   end
 
-  def delete_all_revisions_of(structur_type, unique_identifier) do
+  def delete_all_revisions_of(structur_type, item_id, options) do
+    repo = extract_repo(options)
   end
 
   defp extract_repo(options) do
-    
+    options[:repo] || Application.fetch_env!(:revisionair_ecto, :repo)
+  end
+
+
+  defp put_revision_in_metadata({item, metadata}, revision) do
+    {item, Map.put(metadata, :revision, revision)}
+  end
+
+  defp next_revision(item_type, item_id) do
+    case repo.all(from r in "revisions", where: r.item_type == ^item_type and r.item_id == ^item_id, select: r.revision, limit: 1, order_by: [desc: :revision]) do
+      [] -> 0
+      [num] -> num + 1
+    end
+  end
+
+  defp fetch_newest_revision(item_type, item_id) do
+    case repo.all(from r in "revisions", where: r.item_type == ^item_type and r.item_id == ^item_id, limit: 1, order_by: [desc: :revision], select: {r.revision, {r.item_map, r.metadata}}) do
+      [] -> :error
+      [{revision, {data, metadata}}] -> put_revision_in_metadata({data, metadata}, revision)
+    end
   end
 end
