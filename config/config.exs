@@ -30,6 +30,7 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 config :revisionair_ecto, ecto_repos: [RevisionairEcto.Repo]
+config :revisionair_ecto, repo: RevisionairEcto.Repo
 
 config :revisionair_ecto, RevisionairEcto.Repo,
   adapter: Ecto.Adapters.Postgres,
