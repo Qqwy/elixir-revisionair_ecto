@@ -31,6 +31,7 @@ defmodule RevisionairEcto.Mixfile do
     [
       {:revisionair, "~> 0.10"},
       {:ecto, "~> 2.0"},
+      {:postgrex, "~> 0.13"}
     ]
   end
 end

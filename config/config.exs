@@ -28,3 +28,13 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :revisionair_ecto, ecto_repos: [RevisionairEcto.Repo]
+
+config :revisionair_ecto, RevisionairEcto.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "revisionair_ecto_test",
+  hostname: "localhost",
+  poolsize: 10
