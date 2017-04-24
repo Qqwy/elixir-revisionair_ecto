@@ -38,4 +38,5 @@ config :revisionair_ecto, RevisionairEcto.Repo,
   password: "postgres",
   database: "revisionair_ecto_test",
   hostname: "localhost",
-  poolsize: 10
+  poolsize: 10,
+  pool: Ecto.Adapters.SQL.Sandbox

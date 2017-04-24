@@ -1,15 +1,17 @@
 defmodule RevisionairEctoTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest RevisionairEcto
 
-  test "the truth" do
-    RevisionairEcto.Repo.insert_all("posts", [[title: "1"]])
-    assert 1 + 1 == 2
-  end
+  alias RevisionairEcto.Repo
 
 
   defmodule TestStruct do
     defstruct id: 0, foo: 1, bar: 2
+  end
+
+  setup do
+    # Explicitly get a connection before each test
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
   end
 
 
@@ -25,7 +27,6 @@ defmodule RevisionairEctoTest do
     assert Revisionair.list_revisions(f1b, [storage: RevisionairEcto]) == []
     assert Revisionair.list_revisions(f1, [storage: RevisionairEcto]) == []
 
-    Repo.delete_all("revisions")
   end
 
   test "explicit structure_type and unique_identifier with Revision.Storage.Agent" do
@@ -36,7 +37,6 @@ defmodule RevisionairEctoTest do
     assert Revisionair.store_revision(f1b, [storage: RevisionairEcto]) == :ok
     assert Revisionair.list_revisions(TestStruct, 1, [storage: RevisionairEcto]) == [{f1b, %{revision: 1}},
                                                                                                    {f1, %{revision: 0}}]
-    Repo.delete_all("revisions")
   end
 
   test "get_revision" do
@@ -51,6 +51,5 @@ defmodule RevisionairEctoTest do
     assert Revisionair.get_revision(f1b, 0, [storage: RevisionairEcto]) == \
     {:ok, {%TestStruct{bar: 2, foo: 0, id: 1}, %{revision: 0}}}
 
-    Repo.delete_all("revisions")
   end
 end
