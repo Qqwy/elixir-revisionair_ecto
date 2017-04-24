@@ -1,5 +1,14 @@
-defmodule RevisionairEcto.Repo do
-  use Ecto.Repo, otp_app: :revisionair_ecto
+# defmodule RevisionairEcto.Repo do
+#   use Ecto.Repo, otp_app: :revisionair_ecto
+# end
+
+defmodule Post do
+  use Ecto.Schema
+
+  schema "posts" do
+    field :title, :string
+    field :content, :string
+  end
 end
 
 Mix.Task.run "ecto.create", ~w(-r RevisionairEcto.Repo)
