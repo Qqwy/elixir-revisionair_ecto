@@ -16,7 +16,7 @@ Mix.Task.run "ecto.migrate", ~w(-r RevisionairEcto.Repo)
 
 # Application.put_env(:revisionair_ecto, repo: RevisionairEcto.Repo)
 
-# {:ok, _pid} = RevisionairEcto.Repo.start_link
+{:ok, _pid} = RevisionairEcto.Repo.start_link
 
 
 ExUnit.start()
