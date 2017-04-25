@@ -7,7 +7,10 @@ defmodule RevisionairEcto.Mixfile do
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     elixirc_paths: elixirc_paths(Mix.env),
+     aliases: aliases()
+    ]
   end
 
   # Configuration for the OTP application
@@ -33,6 +36,17 @@ defmodule RevisionairEcto.Mixfile do
       {:ecto, "~> 2.0"},
       {:postgrex, "~> 0.13"},
       {:poison, "~> 3.1"}
+    ]
+  end
+
+  # Ensures `test/support/*.ex` files are read during tests
+  def elixirc_paths(:test), do: ["lib", "test/support"]
+  def elixirc_paths(_), do: ["lib"]
+
+  defp aliases do
+    [
+      # Ensures database is reset before tests are run
+      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end
