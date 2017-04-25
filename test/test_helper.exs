@@ -2,6 +2,7 @@
 #   use Ecto.Repo, otp_app: :revisionair_ecto
 # end
 
+# To test normal ID workings.
 defmodule Post do
   use Ecto.Schema
 
@@ -10,6 +11,18 @@ defmodule Post do
     field :content, :string
   end
 end
+
+# To test workings with UUID
+defmodule UUIDPost do
+  use Ecto.Schema
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+  schema "uuid_posts" do
+    field :title, :string
+    field :content, :string
+  end
+end
+
 
 Mix.Task.run "ecto.drop", ~w(-r RevisionairEcto.Repo)
 Mix.Task.run "ecto.create", ~w(-r RevisionairEcto.Repo)

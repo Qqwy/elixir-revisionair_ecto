@@ -28,9 +28,10 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+config :revisionair, storage: RevisionairEcto
 
 config :revisionair_ecto, ecto_repos: [RevisionairEcto.Repo]
-config :revisionair_ecto, repo: RevisionairEcto.Repo
+config :revisionair_ecto, repo: RevisionairEcto.Repo # This is the line that RevisionairEcto uses.
 
 config :revisionair_ecto, RevisionairEcto.Repo,
   adapter: Ecto.Adapters.Postgres,

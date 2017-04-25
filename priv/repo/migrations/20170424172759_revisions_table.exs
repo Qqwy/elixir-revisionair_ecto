@@ -14,5 +14,6 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsTable do
     end
 
     create index(:revisions, [:item_type, :item_id])
+    create unique_index(:revisions, [:item_type, :item_id, :revision])
   end
 end
