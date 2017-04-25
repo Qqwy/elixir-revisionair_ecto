@@ -1,10 +1,13 @@
 defmodule RevisionairEcto do
   @moduledoc """
   Ecto adapter of the Revisionair.Storage behaviour.
+
+  See `Revisionair` itself for documentation on how to use it.
   """
 
   import Ecto.Query
 
+  @doc false
   def store_revision(item, item_type, item_id, metadata, options) do
     repo = extract_repo(options)
     item_type = to_string item_type
@@ -24,6 +27,7 @@ defmodule RevisionairEcto do
     :ok
   end
 
+  @doc false
   def list_revisions(item_type, item_id, options) do
     repo = extract_repo(options)
     item_type = to_string item_type
@@ -34,6 +38,7 @@ defmodule RevisionairEcto do
     |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_item(item), metadata}, revision) end)
   end
 
+  @doc false
   def newest_revision(item_type, item_id, options) do
     repo = extract_repo(options)
     item_type = to_string item_type
@@ -53,6 +58,7 @@ defmodule RevisionairEcto do
     end
   end
 
+  @doc false
   def get_revision(item_type, item_id, revision, options) do
       repo = extract_repo(options)
       item_type = to_string item_type
@@ -70,6 +76,7 @@ defmodule RevisionairEcto do
     end
   end
 
+  @doc false
   def delete_all_revisions_of(item_type, item_id, options) do
     repo = extract_repo(options)
     item_type = to_string item_type
