@@ -15,7 +15,7 @@ defmodule RevisionairEcto do
     {1, _} = repo.insert_all(revisions_table, [%{
                                    item_type: item_type,
                                    item_id: item_id,
-                                   item_map: encode_struct(item),
+                                   encoded_item: encode_item(item),
                                    metadata: metadata,
                                    revision: next_revision(item_type, item_id, repo, revisions_table)
                                  }])
@@ -27,8 +27,8 @@ defmodule RevisionairEcto do
     item_type = to_string item_type
     revisions_table = extract_table_name(options)
 
-    repo.all(from r in revisions_table, where: r.item_type == ^item_type and r.item_id == ^item_id, select: {r.revision, {r.item_map, r.metadata}}, order_by: [desc: :revision])
-    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_struct(item), metadata}, revision) end)
+    repo.all(from r in revisions_table, where: r.item_type == ^item_type and r.item_id == ^item_id, select: {r.revision, {r.encoded_item, r.metadata}}, order_by: [desc: :revision])
+    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_item(item), metadata}, revision) end)
   end
 
   def newest_revision(item_type, item_id, options) do
@@ -41,10 +41,10 @@ defmodule RevisionairEcto do
           where: r.item_type == ^item_type and r.item_id == ^item_id,
           limit: 1,
           order_by: [desc: :revision],
-          select: {r.revision, {r.item_map, r.metadata}}
+          select: {r.revision, {r.encoded_item, r.metadata}}
         ) do
       [] -> :error
-      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_struct(item), metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item), metadata}, revision)}
     end
   end
 
@@ -57,10 +57,10 @@ defmodule RevisionairEcto do
             from r in revisions_table,
             where: r.item_type == ^item_type and r.item_id == ^item_id and r.revision == ^revision,
             limit: 1,
-            select: {r.revision, {r.item_map, r.metadata}}
+            select: {r.revision, {r.encoded_item, r.metadata}}
           ) do
       [] -> :error
-      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_struct(item), metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item), metadata}, revision)}
     end
   end
 
@@ -89,22 +89,12 @@ defmodule RevisionairEcto do
     end
   end
 
-  defp decode_struct(encoded_struct_string_keys = %{"___struct___" => struct_module_string}) do
-    struct_module = String.to_existing_atom(struct_module_string)
-
-    encoded_struct = for {key, val} <- encoded_struct_string_keys, key != "___struct___", into: %{} do
-      {String.to_existing_atom(key), val}
-    end
-
-    struct(struct_module, encoded_struct)
+  def encode_item(item) do
+    :erlang.term_to_binary(item)
   end
 
-  defp encode_struct(struct) do
-    struct
-    |> Map.from_struct
-    |> Map.put(:___struct___, struct.__struct__ |> to_string)
-    |> Enum.map(fn {k, v} -> {k |> to_string, v} end)
-    |> Enum.into(%{})
+  def decode_item(item_binary) do
+    :erlang.binary_to_term(item_binary)
   end
 
   defp extract_table_name(options) do
