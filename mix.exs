@@ -9,7 +9,12 @@ defmodule RevisionairEcto.Mixfile do
      start_permanent: Mix.env == :prod,
      deps: deps(),
      elixirc_paths: elixirc_paths(Mix.env),
-     aliases: aliases()
+     aliases: aliases(),
+
+     name: "RevisionairEcto",
+     description: description(),
+     package: package(),
+     source_url: "https://github.com/Qqwy/elixir_revisionair_ecto"
     ]
   end
 
@@ -35,7 +40,9 @@ defmodule RevisionairEcto.Mixfile do
       {:revisionair, "~> 0.10"},
       {:ecto, "~> 2.0"},
       {:postgrex, "~> 0.13"},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
@@ -48,5 +55,22 @@ defmodule RevisionairEcto.Mixfile do
       # Ensures database is reset before tests are run
       "test": ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
+  end
+
+  defp package do
+    # These are the default files included in the package
+    [
+      name: :revisionair_ecto,
+      files: ["lib", "mix.exs", "README*"],
+      maintainers: ["Wiebe-Marten Wijnja/Qqwy"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/Qqwy/elixir_revisionair_ecto"}
+    ]
+  end
+
+  defp description do
+    """
+    A Revisionair Storage Adapter based on Ecto. Keeps track of revisions, changes, versions of your data structures.
+    """
   end
 end
