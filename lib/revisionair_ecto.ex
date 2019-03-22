@@ -15,8 +15,6 @@ defmodule RevisionairEcto do
     item_id_type = item_id_type(options)
     encoded_item_id = encode_item_id(item_id, item_id_type)
 
-    IO.inspect({item, item_type, item_id, metadata, options, item_id_type})
-
     {1, _} = repo.insert_all(revisions_table, [%{
                                    item_type: item_type,
                                    item_id: encoded_item_id,
