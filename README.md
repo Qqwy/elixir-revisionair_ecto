@@ -85,3 +85,9 @@ Revisionair.newest_revision(post)
 Revisionair.list_revisions(post)
 Revisionair.get_revision(post, 0)
 ```
+
+## Changelog
+
+- 1.0.2 Removes superfluous and noisy logging call.
+- 1.0.1 Updates Revisionair version.
+- 1.0.0 First Stable Version.
