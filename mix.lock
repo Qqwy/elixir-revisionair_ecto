@@ -7,4 +7,4 @@
   "poison": {:hex, :poison, "3.1.0", "d9eb636610e096f86f25d9a46f35a9facac35609a7591b3be3326e99a0484665", [:mix], []},
   "poolboy": {:hex, :poolboy, "1.5.1", "6b46163901cfd0a1b43d692657ed9d7e599853b3b21b95ae5ae0a777cf9b6ca8", [:rebar], []},
   "postgrex": {:hex, :postgrex, "0.13.2", "2b88168fc6a5456a27bfb54ccf0ba4025d274841a7a3af5e5deb1b755d95154e", [:mix], [{:connection, "~> 1.0", [hex: :connection, optional: false]}, {:db_connection, "~> 1.1", [hex: :db_connection, optional: false]}, {:decimal, "~> 1.0", [hex: :decimal, optional: false]}]},
-  "revisionair": {:hex, :revisionair, "0.13.1", "fb1af1b13d7fc2326d19d6cea103919aa372a1f823310a91f05498ae644e83b2", [:mix], []}}
+  "revisionair": {:hex, :revisionair, "0.13.3", "5796dc652bdf79816a437acbde97bb737eff16c936d5385baff1a4eb843f9dba", [:mix], [], "hexpm"}}
