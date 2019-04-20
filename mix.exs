@@ -38,9 +38,9 @@ defmodule RevisionairEcto.Mixfile do
   defp deps do
     [
       {:revisionair, "~> 0.10"},
-      {:ecto, "~> 2.0"},
-      {:postgrex, "~> 0.13"},
-      {:poison, "~> 3.1"},
+      {:ecto_sql, "~> 3.0"},
+      {:postgrex, "~> 0.14"},
+      {:jason, "~> 1.0"},
 
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
