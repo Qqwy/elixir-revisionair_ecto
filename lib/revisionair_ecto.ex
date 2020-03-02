@@ -18,7 +18,7 @@ defmodule RevisionairEcto do
     {1, _} = repo.insert_all(revisions_table, [%{
                                    item_type: item_type,
                                    item_id: encoded_item_id,
-                                   encoded_item: encode_item(item),
+                                   encoded_item: encode_item(item, options),
                                    metadata: metadata,
                                    revision: next_revision(item_type, item_id, repo, revisions_table, item_id_type)
                                  }])
@@ -33,7 +33,7 @@ defmodule RevisionairEcto do
     item_id_type = item_id_type(options)
 
     repo.all(from r in revisions_table, where: r.item_type == ^item_type and r.item_id == type(^item_id, ^item_id_type), select: {r.revision, {r.encoded_item, r.metadata}}, order_by: [desc: :revision])
-    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_item(item), metadata}, revision) end)
+    |> Enum.map(fn {revision, {item, metadata}} -> put_revision_in_metadata({decode_item(item, options), metadata}, revision) end)
   end
 
   @doc false
@@ -52,7 +52,7 @@ defmodule RevisionairEcto do
           select: {r.revision, {r.encoded_item, r.metadata}}
         ) do
       [] -> :error
-      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item), metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item, options), metadata}, revision)}
     end
   end
 
@@ -70,7 +70,7 @@ defmodule RevisionairEcto do
             select: {r.revision, {r.encoded_item, r.metadata}}
           ) do
       [] -> :error
-      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item), metadata}, revision)}
+      [{revision, {item, metadata}}] -> {:ok, put_revision_in_metadata({decode_item(item, options), metadata}, revision)}
     end
   end
 
@@ -109,12 +109,28 @@ defmodule RevisionairEcto do
     item_id
   end
 
-  defp encode_item(item) do
-    :erlang.term_to_binary(item)
+  defp encode_item(item, options) do
+    case serialization_format(options) do
+      :json ->
+        unless Keyword.has_key?(options, :attributes),
+          do: raise("Attributes are required when using JSON serialization.")
+
+        whitelist_attributes(item, options[:attributes])
+
+      :etf ->
+        :erlang.term_to_binary(item)
+
+      _ ->
+        raise("Unrecognized serialization format type.")
+    end
   end
 
-  defp decode_item(item_binary) do
-    :erlang.binary_to_term(item_binary)
+  defp decode_item(item_binary, options) do
+    case serialization_format(options) do
+      :json -> item_binary
+      :etf -> :erlang.binary_to_term(item_binary)
+      _ -> raise("Unrecognized serialization format type.")
+    end
   end
 
   defp extract_table_name(options) do
@@ -132,4 +148,59 @@ defmodule RevisionairEcto do
   defp map_item_id_type_option_to_item_id_type(:uuid), do: Ecto.UUID
   defp map_item_id_type_option_to_item_id_type(:integer), do: :integer
   defp map_item_id_type_option_to_item_id_type(_), do: :integer
+
+  defp serialization_format(options) do
+    if Keyword.has_key?(options, :serialization_format) do
+      options[:serialization_format]
+    else
+      Application.get_env(:revisionair_ecto, :serialization_format, :etf)
+    end
+  end
+
+  defp whitelist_attributes(item, attributes) when is_list(item) do
+    item
+    |> List.wrap()
+    |> Enum.map(fn ele ->
+      whitelist_attributes(ele, attributes)
+    end)
+  end
+
+  defp whitelist_attributes(item, attributes) do
+    case item do
+      %Ecto.Association.NotLoaded{} ->
+        # if we have recursed into an unloaded association, raise
+        raise("Specified attribute was not preloaded.")
+      _ ->
+        item
+          |> Map.to_list()
+          |> Enum.map(fn {key, value} ->
+            attribute =
+              Enum.find(attributes, fn element ->
+                case element do
+                  {^key, _} -> true
+                  ^key -> true
+                  _ -> false
+                end
+              end)
+
+            new_value =
+              case attribute do
+                nil -> nil
+                {_, new_attributes} -> whitelist_attributes(value, new_attributes)
+                _ -> value
+              end
+
+            case new_value do
+              %Ecto.Association.NotLoaded{} ->
+                # if we have accessed an unloaded association, raise
+                raise("Specified attribute was not preloaded.")
+              _ -> {key, new_value}
+            end
+          end)
+          |> Enum.filter(fn {_, value} ->
+            value != nil
+          end)
+          |> Enum.into(%{})
+    end
+  end
 end

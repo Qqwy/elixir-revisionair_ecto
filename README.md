@@ -30,6 +30,8 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsTable do
       # If you want to use UUIDs instead, alter the following line to
       # add :item_id, :uuid, null: false
       add :item_id, :integer, null: false
+      # If you want to use JSON serialization instead, alter the following line to
+      # add :encoded_item, :json, null: false
       add :encoded_item, :binary, null: false
       add :metadata, :map, null: false
       add :revision, :integer, null: false
@@ -55,6 +57,9 @@ config :revisionair_ecto, repo: RevisionairEcto.Repo
 # Uncomment if you use UUIDs instead of numerical ids:
 # config :revisionair_ecto, item_id_type: :uuid
 
+# Uncomment if you use JSON serialization instead of binary term storage:
+# config :revisionair_ecto, serialization_format: :json
+
 # Uncomment if you use a different table than "revisions" to store the revisions information:
 # config :revisionair_ecto, revisions_table: "table_name"
 ```
@@ -63,7 +68,7 @@ Of course, any of these settings can also be specified in the `options` paramete
 
 ```elixir
 
-Revisionair.store_revision(my_post, [storage: RevisionairEcto, storage_options: [repo: MyOtherRepo, revisions_table: "my_revisions", item_id_type: :uuid]])
+Revisionair.store_revision(my_post, [storage: RevisionairEcto, storage_options: [repo: MyOtherRepo, revisions_table: "my_revisions", item_id_type: :uuid, serialization_format: :json]])
 
 ```
 
@@ -80,7 +85,12 @@ Example:
 
 {:ok, post} = Repo.transaction fn ->
   post = Repo.insert!(%Post{title: "Test", content: "Lorem ipsum"})
+  
   :ok = Revisionair.store_revision(post, Post, post.id)
+  
+  # if using JSON serialization, you must also pass a whitelist of attributes you wish to serialize:
+  # :ok = Revisionair.store_revision(post, Post, post.id, [storage_options: [attributes: [:id, :content, :title]]])
+
   post
 end
 

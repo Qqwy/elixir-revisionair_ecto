@@ -84,4 +84,86 @@ defmodule RevisionairEctoTest do
     assert Revisionair.list_revisions(post, storage_options: [revisions_table: "uuid_revisions", item_id_type: :uuid]) == []
   end
 
+  test "raises an error when given serialization_format is not supported" do
+    post = Repo.insert!(%Post{title: "Test", content: "Lorem ipsum"})
+
+    assert_raise RuntimeError, "Unrecognized serialization format type.", fn ->
+      Revisionair.store_revision(post, Post, post.id,
+        storage_options: [
+          serialization_format: :an_unknown_format
+        ]
+      )
+    end
+
+    :ok = Revisionair.store_revision(post, Post, post.id)
+
+    assert_raise RuntimeError, "Unrecognized serialization format type.", fn ->
+      Revisionair.newest_revision(post,
+        storage_options: [
+          serialization_format: :an_unknown_format
+        ]
+      )
+    end
+  end
+
+  describe "JSON serialization integration" do
+    test "serializes and retrieves correctly" do
+      # Application.put_env(:revisionair_ecto, :revisions_table, "json_revisions")
+
+      {:ok, post} = Repo.transaction fn ->
+        post = Repo.insert!(%Post{title: "Test", content: "Lorem ipsum"})
+
+        :ok =
+          Revisionair.store_revision(post, Post, post.id,
+            storage_options: [
+              revisions_table: "json_revisions",
+              serialization_format: :json,
+              attributes: [:id, :title, :content]
+            ]
+          )
+
+        post
+      end
+
+      expected_post_map = %{
+        "content" => post.content,
+        "id" => post.id,
+        "title" => post.title,
+      }
+
+      assert Repo.all(Post) != []
+      assert Revisionair.get_revision(post, 0, storage_options: [revisions_table: "json_revisions", serialization_format: :json]) == {:ok, {expected_post_map, %{revision: 0}}}
+      assert Revisionair.newest_revision(post, storage_options: [revisions_table: "json_revisions", serialization_format: :json]) == {:ok, {expected_post_map, %{revision: 0}}}
+      assert Revisionair.list_revisions(post, storage_options: [revisions_table: "json_revisions", serialization_format: :json]) == [{expected_post_map, %{revision: 0}}]
+      assert Revisionair.delete_all_revisions_of(post, storage_options: [revisions_table: "json_revisions", serialization_format: :json]) == :ok
+      assert Revisionair.list_revisions(post, storage_options: [revisions_table: "json_revisions", serialization_format: :json]) == []
+    end
+
+    test "raises an error when attributes aren't passed for serializing" do
+      post = Repo.insert!(%Post{title: "Test", content: "Lorem ipsum"})
+
+      assert_raise RuntimeError, "Attributes are required when using JSON serialization.", fn ->
+        Revisionair.store_revision(post, Post, post.id,
+          storage_options: [
+            revisions_table: "json_revisions",
+            serialization_format: :json
+          ]
+        )
+      end
+    end
+
+    test "raises an error when one of the attributes passed is an unloaded Ecto association" do
+      post = Repo.insert!(%Post{title: "Test", content: "Lorem ipsum"})
+
+      assert_raise RuntimeError, "Specified attribute was not preloaded.", fn ->
+        Revisionair.store_revision(post, Post, post.id,
+          storage_options: [
+            revisions_table: "json_revisions",
+            serialization_format: :json,
+            attributes: [:id, :title, :content, :comments]
+          ]
+        )
+      end
+    end
+  end
 end
