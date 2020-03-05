@@ -101,6 +101,7 @@ Revisionair.get_revision(post, 0)
 
 ## Changelog
 
+- 1.2.0 Adds the possibility to serialize data using a JSON format instead of the Erlang Term Format.
 - 1.1.0 Upgrade to Ecto 3.
 - 1.0.2 Removes superfluous and noisy logging call.
 - 1.0.1 Updates Revisionair version.
