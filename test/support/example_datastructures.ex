@@ -1,4 +1,5 @@
 defmodule Comment do
+  @moduledoc false
   use Ecto.Schema
 
   schema "comments" do
@@ -8,6 +9,7 @@ end
 
 # To test normal, numerical IDs.
 defmodule Post do
+  @moduledoc false
   use Ecto.Schema
 
   schema "posts" do
@@ -19,6 +21,7 @@ end
 
 # To test working with UUIDs.
 defmodule UUIDPost do
+  @moduledoc false
   use Ecto.Schema
 
   @primary_key {:id, :binary_id, autogenerate: true}

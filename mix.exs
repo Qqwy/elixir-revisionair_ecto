@@ -42,7 +42,8 @@ defmodule RevisionairEcto.Mixfile do
       {:postgrex, "~> 0.14"},
       {:jason, "~> 1.0"},
 
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

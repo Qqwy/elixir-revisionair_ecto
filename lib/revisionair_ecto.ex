@@ -172,35 +172,37 @@ defmodule RevisionairEcto do
         raise("Specified attribute was not preloaded.")
       _ ->
         item
-          |> Map.to_list()
-          |> Enum.map(fn {key, value} ->
-            attribute =
-              Enum.find(attributes, fn element ->
-                case element do
-                  {^key, _} -> true
-                  ^key -> true
-                  _ -> false
-                end
-              end)
+        |> Map.to_list()
+        |> Enum.map(&whitelist_attribute(&1, item, attributes))
+        |> Enum.filter(fn {_, value} ->
+          value != nil
+        end)
+        |> Enum.into(%{})
+    end
+  end
 
-            new_value =
-              case attribute do
-                nil -> nil
-                {_, new_attributes} -> whitelist_attributes(value, new_attributes)
-                _ -> value
-              end
+  defp whitelist_attribute({key, value}, item, attributes) do
+    attribute =
+      Enum.find(attributes, fn element ->
+        case element do
+          {^key, _} -> true
+          ^key -> true
+          _ -> false
+        end
+      end)
 
-            case new_value do
-              %Ecto.Association.NotLoaded{} ->
-                # if we have accessed an unloaded association, raise
-                raise("Specified attribute was not preloaded.")
-              _ -> {key, new_value}
-            end
-          end)
-          |> Enum.filter(fn {_, value} ->
-            value != nil
-          end)
-          |> Enum.into(%{})
+    new_value =
+      case attribute do
+        nil -> nil
+        {_, new_attributes} -> whitelist_attributes(value, new_attributes)
+        _ -> value
+      end
+
+    case new_value do
+      %Ecto.Association.NotLoaded{} ->
+        # if we have accessed an unloaded association, raise
+        raise("Specified attribute was not preloaded.")
+      _ -> {key, new_value}
     end
   end
 end
