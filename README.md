@@ -100,6 +100,7 @@ Revisionair.get_revision(post, 0)
 
 ## Changelog
 
+- 1.2.1 Updates migration examples (in README and tests) to no longer include unneccesary primary key and superfluous index.
 - 1.2.0 Adds the possibility to serialize data using a JSON format instead of the Erlang Term Format.
 - 1.1.0 Upgrade to Ecto 3.
 - 1.0.2 Removes superfluous and noisy logging call.
