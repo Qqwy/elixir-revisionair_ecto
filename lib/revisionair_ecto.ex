@@ -173,7 +173,7 @@ defmodule RevisionairEcto do
       _ ->
         item
         |> Map.to_list()
-        |> Enum.map(&whitelist_attribute(&1, item, attributes))
+        |> Enum.map(&whitelist_attribute(&1, attributes))
         |> Enum.filter(fn {_, value} ->
           value != nil
         end)
@@ -181,7 +181,7 @@ defmodule RevisionairEcto do
     end
   end
 
-  defp whitelist_attribute({key, value}, item, attributes) do
+  defp whitelist_attribute({key, value}, attributes) do
     attribute =
       Enum.find(attributes, fn element ->
         case element do

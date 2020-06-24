@@ -9,15 +9,7 @@ matrix:
       elixir: 1.9
     - otp_release: 22.0
       elixir: 1.10
-before_script:
-  - MIX_ENV=test mix compile --warnings-as-errors
 
 addons:
   # jsonb support
   postgresql: "9.6"
-
-cache:
-  directories:
-    - ~/.mix
-    - ~/.hex
-    - _build
