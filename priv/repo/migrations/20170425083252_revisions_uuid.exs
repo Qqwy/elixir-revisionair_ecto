@@ -9,7 +9,6 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsUuid do
       add :encoded_item, :binary, null: false
       add :metadata, :map, null: false
       add :revision, :integer, null: false
-      add :struct_name, :string
     end
 
     create unique_index(:uuid_revisions, [:item_type, :item_id, :revision])

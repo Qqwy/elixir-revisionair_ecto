@@ -9,7 +9,6 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsJson do
       add :encoded_item, :json, null: false
       add :metadata, :map, null: false
       add :revision, :integer, null: false
-      add :struct_name, :string
     end
 
     create index(:json_revisions, [:item_type, :item_id])

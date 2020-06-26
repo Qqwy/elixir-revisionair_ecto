@@ -11,7 +11,6 @@ defmodule RevisionairEcto.Repo.Migrations.RevisionsTable do
       add :encoded_item, :binary, null: false
       add :metadata, :map, null: false
       add :revision, :integer, null: false
-      add :struct_name, :string
     end
 
     create unique_index(:revisions, [:item_type, :item_id, :revision])
