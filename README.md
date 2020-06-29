@@ -97,6 +97,7 @@ Revisionair.list_revisions(post)
 Revisionair.get_revision(post, 0)
 ```
 
+
 ## Changelog
 
 - 1.2.2 Removes unused `struct_name` column from migration examples.
