@@ -15,6 +15,6 @@
   "poison": {:hex, :poison, "3.1.0", "d9eb636610e096f86f25d9a46f35a9facac35609a7591b3be3326e99a0484665", [:mix], [], "hexpm"},
   "poolboy": {:hex, :poolboy, "1.5.2", "392b007a1693a64540cead79830443abf5762f5d30cf50bc95cb2c1aaafa006b", [], [], "hexpm"},
   "postgrex": {:hex, :postgrex, "0.15.5", "aec40306a622d459b01bff890fa42f1430dac61593b122754144ad9033a2152f", [:mix], [{:connection, "~> 1.0", [hex: :connection, repo: "hexpm", optional: false]}, {:db_connection, "~> 2.1", [hex: :db_connection, repo: "hexpm", optional: false]}, {:decimal, "~> 1.5", [hex: :decimal, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: true]}], "hexpm", "ed90c81e1525f65a2ba2279dbcebf030d6d13328daa2f8088b9661eb9143af7f"},
-  "revisionair": {:hex, :revisionair, "0.13.3", "5796dc652bdf79816a437acbde97bb737eff16c936d5385baff1a4eb843f9dba", [:mix], [], "hexpm", "6856fa79ab8535af5e089ba04bd0a4456dfc37aa21e64ef5ad6d9ffc8e97926c"},
+  "revisionair": {:hex, :revisionair, "0.13.4", "ce0f0da792e5b56d3da9c11228c6cca595d69d738fe674d494664e63a32f6bd1", [:mix], [], "hexpm", "543c666923d60ce66d34d56fedc00712dea2fbbd2bbb64d63dcb5ac1552371fe"},
   "telemetry": {:hex, :telemetry, "0.4.2", "2808c992455e08d6177322f14d3bdb6b625fbcfd233a73505870d8738a2f4599", [:rebar3], [], "hexpm", "2d1419bd9dda6a206d7b5852179511722e2b18812310d304620c7bd92a13fcef"},
 }
