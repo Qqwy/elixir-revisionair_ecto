@@ -13,7 +13,7 @@ First, install the library by adding `revisionair_ecto` to your list of dependen
 
 ```elixir
 def deps do
-  [{:revisionair_ecto, "~> 1.0.0"}]
+  [{:revisionair_ecto, "~> 1.0"}]
 end
 ```
 
